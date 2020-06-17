@@ -3,46 +3,52 @@ package com.flyteam.bbqvideo.data;
 /**
  * A generic class that holds a result success w/ data or an error exception.
  */
-public class Result<T> {
-    // hide the private constructor to limit subclass types (Success, Error)
-    private Result() {
+import java.io.Serializable;
+
+public class Result<T> implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private int resultCode;
+    private String message;
+    private T data;
+
+    public Result() {
+    }
+
+    public Result(int resultCode, String message) {
+        this.resultCode = resultCode;
+        this.message = message;
+    }
+
+    public int getResultCode() {
+        return resultCode;
+    }
+
+    public void setResultCode(int resultCode) {
+        this.resultCode = resultCode;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
     }
 
     @Override
     public String toString() {
-        if (this instanceof Result.Success) {
-            Result.Success success = (Result.Success) this;
-            return "Success[data=" + success.getData().toString() + "]";
-        } else if (this instanceof Result.Error) {
-            Result.Error error = (Result.Error) this;
-            return "Error[exception=" + error.getError().toString() + "]";
-        }
-        return "";
-    }
-
-    // Success sub-class
-    public final static class Success<T> extends Result {
-        private T data;
-
-        public Success(T data) {
-            this.data = data;
-        }
-
-        public T getData() {
-            return this.data;
-        }
-    }
-
-    // Error sub-class
-    public final static class Error extends Result {
-        private Exception error;
-
-        public Error(Exception error) {
-            this.error = error;
-        }
-
-        public Exception getError() {
-            return this.error;
-        }
+        return "Result{" +
+                "resultCode=" + resultCode +
+                ", message='" + message + '\'' +
+                ", data=" + data +
+                '}';
     }
 }

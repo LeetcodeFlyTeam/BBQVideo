@@ -1,6 +1,8 @@
 package com.flyteam.bbqvideo.data;
 
+import com.flyteam.bbqvideo.R;
 import com.flyteam.bbqvideo.data.model.LoggedInUser;
+import com.flyteam.bbqvideo.ui.login.LoginViewModel;
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -15,7 +17,7 @@ public class LoginRepository {
     // If user credentials will be cached in local storage, it is recommended it be encrypted
     // @see https://developer.android.com/training/articles/keystore
     private LoggedInUser user = null;
-
+    private LoginViewModel loginViewModel = null;
     // private constructor : singleton access
     private LoginRepository(LoginDataSource dataSource) {
         this.dataSource = dataSource;
@@ -43,12 +45,17 @@ public class LoginRepository {
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    public Result<LoggedInUser> login(String username, String password) {
+    public void login(LoginViewModel loginViewModel,String username, String password) {
         // handle login
-        Result<LoggedInUser> result = dataSource.login(username, password);
-        if (result instanceof Result.Success) {
-            setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
+        this.loginViewModel = loginViewModel;
+        dataSource.login(this,username, password);
+    }
+
+    public void loginRsp(Result<LoggedInUser> result){
+        if(loginViewModel!=null){
+            LoggedInUser data= result.getData();
+            setLoggedInUser(data);
+            loginViewModel.loginRsp(result);
         }
-        return result;
     }
 }

@@ -1,28 +1,75 @@
 package com.flyteam.bbqvideo.data;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+
+import com.alibaba.fastjson.JSON;
 import com.flyteam.bbqvideo.data.model.LoggedInUser;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
 public class LoginDataSource {
-
-    public Result<LoggedInUser> login(String username, String password) {
-
+    Handler mainHandler = new Handler(Looper.getMainLooper());
+    public void login(final LoginRepository loginRepository,String username, String password) {
         try {
             // TODO: handle loggedInUser authentication
-            LoggedInUser fakeUser =
-                    new LoggedInUser(
-                            java.util.UUID.randomUUID().toString(),
-                            "Jane Doe");
-            return new Result.Success<>(fakeUser);
+            final String url = " http://192.168.0.101:8080/login";
+            OkHttpClient client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS)//设置超时时间
+                    .build();
+            RequestBody formBody = new FormBody.Builder()   //创建表单请求体，具体的参数设置也要去看源码才更清楚
+                    .add("username",username)
+                    .add("password",password)
+                    .build();
+            Request request = new Request.Builder()//创建Request 对象。
+                    .url(url)
+                    .post(formBody)//传递请求体   //与get的区别在这里
+                    .build();
+            client.newCall(request).enqueue(new Callback()
+            {
+                @Override
+                public void onFailure(Call call, IOException e)
+                {
+                    Log.d("TAG  post失败",url);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException
+                {
+                    if(response.isSuccessful())
+                    {
+                        final  String content = response.body().string();
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                final Result sucResult = JSON.parseObject(content, Result.class);
+                                sucResult.setData(JSON.parseObject(sucResult.getData().toString(), LoggedInUser.class));
+                                loginRepository.loginRsp(sucResult);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        Log.d("PostFail ",url);
+                    }
+                }
+            });
         } catch (Exception e) {
-            return new Result.Error(new IOException("Error logging in", e));
+            loginRepository.loginRsp(ResultGenerator.genFailResult(e.toString()));
         }
     }
-
     public void logout() {
         // TODO: revoke authentication
     }
