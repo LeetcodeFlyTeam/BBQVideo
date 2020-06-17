@@ -29,20 +29,25 @@ public class LoginDataSource {
             final String url = " http://192.168.0.101:8080/login";
             OkHttpClient client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS)//设置超时时间
                     .build();
-            RequestBody formBody = new FormBody.Builder()   //创建表单请求体，具体的参数设置也要去看源码才更清楚
+            RequestBody formBody = new FormBody.Builder()   //创建表单请求体
                     .add("username",username)
                     .add("password",password)
                     .build();
-            Request request = new Request.Builder()//创建Request 对象。
+            Request request = new Request.Builder()//创建Request对象
                     .url(url)
-                    .post(formBody)//传递请求体   //与get的区别在这里
+                    .post(formBody)//传递请求体
                     .build();
             client.newCall(request).enqueue(new Callback()
             {
                 @Override
                 public void onFailure(Call call, IOException e)
                 {
-                    Log.d("TAG  post失败",url);
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            loginRepository.loginRsp(ResultGenerator.genFailResult("请求失败"));
+                        }
+                    });
                 }
 
                 @Override
@@ -55,14 +60,21 @@ public class LoginDataSource {
                             @Override
                             public void run() {
                                 final Result sucResult = JSON.parseObject(content, Result.class);
-                                sucResult.setData(JSON.parseObject(sucResult.getData().toString(), LoggedInUser.class));
+                                if(sucResult.getData()!=null){
+                                    sucResult.setData(JSON.parseObject(sucResult.getData().toString(), LoggedInUser.class));
+                                }
                                 loginRepository.loginRsp(sucResult);
                             }
                         });
                     }
                     else
                     {
-                        Log.d("PostFail ",url);
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                loginRepository.loginRsp(ResultGenerator.genFailResult("请求失败"));
+                            }
+                        });
                     }
                 }
             });

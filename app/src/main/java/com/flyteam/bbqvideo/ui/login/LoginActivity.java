@@ -127,16 +127,6 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 loginViewModel.login(usernameEditText.getText().toString(),passwordEditText.getText().toString());
-                /*
-                //asyncGet();
-                try {
-                    //postAsync();
-                    asyncGet();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                //
-                 */
             }
         });
     }
@@ -147,68 +137,7 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
     }
 
-    private void showLoginFailed(@StringRes Integer errorString) {
+    private void showLoginFailed(String errorString) {
         Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
     }
-
-    //异步请求
-    public void asyncGet() {
-        //创建OkHttp客户端
-        OkHttpClient client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS)//设置超时时间
-                .build();
-
-        //创建Request请求，这里是get
-        String url = "http://192.168.0.101:8080/GetUserList"; //  http://www.baidu.com
-        Request request = new Request.Builder().url(url).get().build();
-
-        //通过客户端创建Call
-        Call call = client.newCall(request);
-        //进行异步请求
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("OkHttp", e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final  String content=response.body().string();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.e("TAG post成功",content);
-                        //text.setText(content);
-                    }
-                });
-                handler.sendEmptyMessage(0);
-                Log.d("OkHttp", response.body().string());
-            }
-        });
-    }
-
-    private void postAsync() throws Exception
-    {
-
-
-    }
-
-
-    private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            final ProgressBar loadingProgressBar = findViewById(R.id.loading);
-            switch(msg.what){
-                case 0:
-                    //final Button loginButton = findViewById(R.id.login);
-                    loadingProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(getApplicationContext(), "请求成功", Toast.LENGTH_SHORT).show();
-                    //loginButton.setEnabled(true);
-                break;
-                case 1:
-                break;
-                default:
-                break;
-            }
-        }
-    };
 }

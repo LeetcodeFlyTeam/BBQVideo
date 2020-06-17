@@ -41,7 +41,7 @@ public class LoginViewModel extends ViewModel {
             loginResult.setValue(new LoginResult(new LoggedInUserView(data.getNickName())));
         }
         else{
-            loginResult.setValue(new LoginResult(R.string.login_failed));
+            loginResult.setValue(new LoginResult("登录失败"));
         }
     }
 
