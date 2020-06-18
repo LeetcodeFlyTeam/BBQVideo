@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import com.flyteam.bbqvideo.R;
 import com.flyteam.bbqvideo.ui.login.LoginViewModel;
 import com.flyteam.bbqvideo.ui.login.LoginViewModelFactory;
+import com.flyteam.bbqvideo.ui.main.MainActivity;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -81,13 +83,14 @@ public class LoginActivity extends AppCompatActivity {
                 if (loginResult.getError() != null) {
                     showLoginFailed(loginResult.getError());
                 }
-                if (loginResult.getSuccess() != null) {
+                else if (loginResult.getSuccess() != null) {
                     updateUiWithUser(loginResult.getSuccess());
+                    Intent intent=new Intent(LoginActivity.this, MainActivity.class); startActivity(intent);
                 }
-                setResult(Activity.RESULT_OK);
+                //setResult(Activity.RESULT_OK);
 
                 //Complete and destroy login activity once successful
-                finish();
+                //finish();
             }
         });
 
