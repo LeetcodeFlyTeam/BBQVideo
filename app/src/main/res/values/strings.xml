@@ -13,4 +13,6 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_activity_video_player">VideoPlayerActivity</string>
+    <string name="video_decode_player">视频硬解码播放</string>
 </resources>
